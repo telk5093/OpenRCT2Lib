@@ -2,10 +2,24 @@
 **OpenRCT2Lib** parses [OpenRCT2](https://github.com/OpenRCT2/OpenRCT2)'s New Savefile format (_*.park_).  
 This offers _*.park_ file's informations, such as Park's name, Scenario's objective and etc.
 
+# Example
+```nodejs
 
-# References
- * https://github.com/OpenRCT2/OpenRCT2/blob/develop/src/openrct2/ParkFile.cpp
- * https://raw.githubusercontent.com/OpenRCT2/OpenRCT2/develop/docs/save-format.md (I think it might be outdated but useful for ref.)
+```
+
+# Header
+Header is not compressed even if the save file is compressed with gzip.
+| Property         | Description                                  | Misc.                                            |
+|------------------|----------------------------------------------|--------------------------------------------------|
+| magic            |                                              |                                                  |
+| targetVersion    |                                              |                                                  |
+| minVersion       |                                              |                                                  |
+| numChunks        | Count of chunks                              |                                                  |
+| uncompressedSize | uncompressed size                            |                                                  |
+| compression      | 0: uncompressed, 1: gzip                     |                                                  |
+| compressedSize   | compressed size                              |                                                  |
+| FNV1a            | FNV1a hash                                   | _(Offers array of integers yet due to my skill)_ |
+| padding          | It is just a padding, which is filled with 0 |                                                  |
 
 
 # Chunk
@@ -160,3 +174,9 @@ _(Not supported yet)_
 
 ## 0x80: Packed objects
 _(Not supported yet)_
+
+
+# References
+ * https://github.com/OpenRCT2/OpenRCT2/blob/develop/src/openrct2/ParkFile.cpp
+ * https://raw.githubusercontent.com/OpenRCT2/OpenRCT2/develop/docs/save-format.md (I think it might be outdated but useful for ref.)
+
