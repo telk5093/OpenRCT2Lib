@@ -123,10 +123,10 @@ _(Not supported yet)_
 | park.weeklyProfitHistory         | History of weekly profit                        |       |
 | park.parkValueHistory            | History of park value                           |       |
 
-
+<!--
 ## 0x07: History
 _(This chunk is commented so not used)_
-
+-->
 
 ## 0x08: Research
 | Property                 | Description | Misc. |
@@ -162,9 +162,10 @@ _(Not supported yet)_
 ## 0x33: Banners
 _(Not supported yet)_
 
-
+<!--
 ## 0x35: Staff
 _(This chunk is commented so not used)_
+-->
 
 
 ## 0x36: Cheats
@@ -181,5 +182,6 @@ _(Not supported yet)_
 
 # References
  * https://github.com/OpenRCT2/OpenRCT2/blob/develop/src/openrct2/ParkFile.cpp
- * https://raw.githubusercontent.com/OpenRCT2/OpenRCT2/develop/docs/save-format.md (I think it might be outdated but useful for ref.)
+ * https://raw.githubusercontent.com/OpenRCT2/OpenRCT2/develop/docs/save-format.md  
+ (I think it might be outdated but useful for ref.)
 
