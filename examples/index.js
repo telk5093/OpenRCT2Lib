@@ -1,4 +1,4 @@
-const OpenRCT2Lib = require('../OpenRCT2Lib.js');
+const OpenRCT2Lib = require('../dist/OpenRCT2Lib.js');
 
 
 let parkData = new OpenRCT2Lib(__dirname + '/Forest Frontiers.park');

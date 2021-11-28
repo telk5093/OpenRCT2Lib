@@ -1,14 +1,32 @@
 {
   "name": "openrct2lib",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "OpenRCT2 New Savefile Format parser",
+  "main": "dist/OpenRCT2Lib.js",
   "scripts": {
     "test": "node ./examples/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "openrct2",
+    "rct2",
+    "rollercoastertycoon",
+    "new savefile format"
+  ],
+  "author": {
+    "name": "Willem Lee",
+    "email": "telk5093@gmail.com",
+    "url": "https://telk.kr"
+  },
+  "homepage": "https://github.com/telk5093/OpenRCT2Lib",
+  "bugs": {
+    "url": "https://github.com/telk5093/OpenRCT2Lib/issues",
+    "email": "telk5093@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/telk5093/OpenRCT2Lib.git"
+  },
+  "license": "MIT",
   "dependencies": {
     "pako": "^2.0.4"
   }

@@ -1,7 +1,6 @@
 "use strict";
 const fs = require('fs');
 const pako = require('pako');
-const zlib = require('zlib');
 
 class OpenRCT2Lib {
     constructor(path) {
@@ -82,14 +81,16 @@ class OpenRCT2Lib {
         
         // Split each chunk
         let chunkPos = 0;
-        rst.chunkData = {};
         for (let c in chunkMetaData) {
             let _chunkID     = chunkMetaData[c][0];
             let _chunkOffset = chunkMetaData[c][1];
             let _chunkSize   = chunkMetaData[c][2];
             let currentChunkData = gameData.slice(_chunkOffset, _chunkOffset + _chunkSize);
-            rst.chunkData[_chunkID] = this.getChunk(_chunkID, currentChunkData);
-
+            let _chunkData = this.getChunk(_chunkID, currentChunkData)
+            let _key = Object.keys(_chunkData)[0];
+            if (_key && _key != '0') {
+                rst[_key] = _chunkData[_key];
+            }
             chunkPos += _chunkSize;
         }
 
@@ -108,10 +109,11 @@ class OpenRCT2Lib {
         switch (chunkID) {
             // 0x01  Authoring
             case 0x01:
-                rst.engine = chunk.getString();
-                rst.authors = chunk.getStringArray();
-                rst.dateStarted = chunk.getTimestamp();
-                rst.dateModified = chunk.getTimestamp();
+                rst.authoring = {};
+                rst.authoring.engine = chunk.getString();
+                rst.authoring.authors = chunk.getStringArray();
+                rst.authoring.dateStarted = chunk.getTimestamp();
+                rst.authoring.dateModified = chunk.getTimestamp();
                 break;
 
             // 0x02  Objects
@@ -120,10 +122,11 @@ class OpenRCT2Lib {
 
             // 0x03  Scenario
             case 0x03:
-                rst.category = chunk.getInt(4);
-                rst.name = chunk.getStringTable();
-                rst.parkName = chunk.getStringTable();
-                rst.details = chunk.getStringTable();
+                rst.scenario = {};
+                rst.scenario.category = chunk.getInt(4);
+                rst.scenario.name = chunk.getStringTable();
+                rst.scenario.parkName = chunk.getStringTable();
+                rst.scenario.details = chunk.getStringTable();
 
                 let objectiveType = chunk.getInt(4);
                 let objectiveYear = chunk.getInt(4);
@@ -165,7 +168,7 @@ class OpenRCT2Lib {
                         break;
                 }
 
-                rst.objective = {
+                rst.scenario.objective = {
                     'type': objectiveType,
                     'typeText': objectiveTypeText,
                     'year': objectiveYear,
@@ -180,34 +183,37 @@ class OpenRCT2Lib {
 
             // 0x04  General
             case 0x04:
-                rst.gamePaused = chunk.getInt(4);
-                rst.currentTicks = chunk.getInt(4);
-                rst.dateMonthTicks = chunk.getInt(4);
-                rst.dateMonthsElapsed = chunk.getInt(4);
-                rst.rand = [
-                    chunk.getInt(4),
-                    chunk.getInt(4),
-                ];
-                rst.guestInitialHappiness = chunk.getInt(4);
-                rst.guestInitialCash = chunk.getMoney(4);
-                rst.guestInitialHunger = chunk.getInt(4);
-                rst.guestInitialThirst = chunk.getInt(4);
-                rst.nextGuestNumber = chunk.getInt(4);
-                // rst.peepSpawns = chunk.getXYZD();
+                rst.general = {};
+                rst.general.gamePaused = chunk.getInt(4);
+                rst.general.currentTicks = chunk.getInt(4);
+                rst.general.dateMonthTicks = chunk.getInt(4);
+                rst.general.dateMonthsElapsed = chunk.getInt(4);
+                rst.general.rand = chunk.getInt(8);
+                // rst.general.rand = [
+                //     chunk.getInt(4),
+                //     chunk.getInt(4),
+                // ];
+                rst.general.guestInitialHappiness = chunk.getInt(4);
+                rst.general.guestInitialCash = chunk.getMoney(4);
+                rst.general.guestInitialHunger = chunk.getInt(4);
+                rst.general.guestInitialThirst = chunk.getInt(4);
+                rst.general.nextGuestNumber = chunk.getInt(4);
+                // rst.general.peepSpawns = chunk.getXYZD();
                 break;
 
             // 0x05  Climate
             case 0x05:
-                rst.climate = chunk.getInt(4);   // 0=CoolAndWet, 1=Warm, 2=HotAndDry, 3=Cold
-                rst.climateUpdateTimer = chunk.getInt(4);
-                rst.climateCurrent = {
+                rst.climate = {};
+                rst.climate.state = chunk.getInt(4);   // 0=CoolAndWet, 1=Warm, 2=HotAndDry, 3=Cold
+                rst.climate.updateTimer = chunk.getInt(4);
+                rst.climate.current = {
                     'weather': chunk.getInt(4),
                     'temperature': chunk.getInt(4),
                     'weatherEffect': chunk.getInt(4),
                     'weatherGloom': chunk.getInt(4),
                     'level': chunk.getInt(4),
                 };
-                rst.climateNext = {
+                rst.climate.next = {
                     'weather': chunk.getInt(4),
                     'temperature': chunk.getInt(4),
                     'weatherEffect': chunk.getInt(4),
@@ -218,53 +224,54 @@ class OpenRCT2Lib {
 
             // 0x06  Park
             case 0x06:
-                rst.parkName = chunk.getString();
-                rst.cash = chunk.getMoney();
-                rst.loan = chunk.getMoney();
-                rst.maxLoan = chunk.getMoney();
-                rst.loanInterestRate = chunk.getInt(4);
-                rst.parkFlags = chunk.getInt(8);
-                rst.parkEntranceFee = chunk.getMoney(4);
-                rst.staffHandymanColour = chunk.getInt(4);
-                rst.staffMechanicColour = chunk.getInt(4);
-                rst.staffSecurityColour = chunk.getInt(4);
-                rst.samePriceThroughoutPark = chunk.getInt(8);
-                rst.numMonths = chunk.getInt(4);
-                rst.numTypes = chunk.getInt(4);
-                rst.expenditureTable = [];
-                for (let i=0; i<rst.numMonths; i++) {
-                    rst.expenditureTable[i] = [];
+                rst.park = {};
+                rst.park.name = chunk.getString();
+                rst.park.cash = chunk.getMoney();
+                rst.park.loan = chunk.getMoney();
+                rst.park.maxLoan = chunk.getMoney();
+                rst.park.loanInterestRate = chunk.getInt(4);
+                rst.park.parkFlags = chunk.getInt(8);
+                rst.park.parkEntranceFee = chunk.getMoney(4);
+                rst.park.staffHandymanColour = chunk.getInt(4);
+                rst.park.staffMechanicColour = chunk.getInt(4);
+                rst.park.staffSecurityColour = chunk.getInt(4);
+                rst.park.samePriceThroughoutPark = chunk.getInt(8);
+                rst.park.numMonths = chunk.getInt(4);
+                rst.park.numTypes = chunk.getInt(4);
+                rst.park.expenditureTable = [];
+                for (let i=0; i<rst.park.numMonths; i++) {
+                    rst.park.expenditureTable[i] = [];
                     for (let j=0; j<rst.numTypes; j++) {
-                        rst.expenditureTable[i][j] = chunk.getMoney();
+                        rst.park.expenditureTable[i][j] = chunk.getMoney();
                     }
                 }
-                rst.historicalProfit = chunk.getMoney();
-                rst.marketingCampaigns = chunk.getIntArray();
-                rst.currentAwards = chunk.getIntArray();
-                rst.parkValue = chunk.getMoney();
-                rst.companyValue = chunk.getMoney();
-                rst.parkSize = chunk.getInt(4);
-                rst.numGuestsInPark = chunk.getInt(4);
-                rst.numGuestsHeadingForPark = chunk.getInt(4);
-                rst.parkRating = chunk.getInt(4);
-                rst.parkRatingCasualtyPenalty = chunk.getInt(4);
-                rst.currentExpenditure = chunk.getMoney();
-                rst.currentProfit = chunk.getMoney();
-                rst.weeklyProfitAverageDividend = chunk.getMoney();
-                rst.weeklyProfitAverageDivisor = chunk.getInt(4);
-                rst.totalAdmissions = chunk.getMoney();
-                rst.totalIncomeFromAdmissions = chunk.getMoney();
-                rst.totalRideValueForMoney = chunk.getMoney(4);
-                rst.numGuestsInParkLastWeek = chunk.getInt(4);
-                rst.guestChangeModifier = chunk.getInt(4);
-                rst.guestGenerationProbability = chunk.getInt(4);
-                rst.suggestedGuestMaximum = chunk.getInt(4);
-                rst.peepWarningThrottle = chunk.getIntArray();
-                rst.parkRatingHistory = chunk.getIntArray();
-                rst.guestsInParkHistory = chunk.getIntArray();
-                rst.cashHistory = chunk.getIntArray();
-                rst.weeklyProfitHistory = chunk.getIntArray();
-                rst.parkValueHistory = chunk.getIntArray();
+                rst.park.historicalProfit = chunk.getMoney();
+                rst.park.marketingCampaigns = chunk.getIntArray();
+                rst.park.currentAwards = chunk.getIntArray();
+                rst.park.parkValue = chunk.getMoney();
+                rst.park.companyValue = chunk.getMoney();
+                rst.park.parkSize = chunk.getInt(4);
+                rst.park.numGuestsInPark = chunk.getInt(4);
+                rst.park.numGuestsHeadingForPark = chunk.getInt(4);
+                rst.park.parkRating = chunk.getInt(4);
+                rst.park.parkRatingCasualtyPenalty = chunk.getInt(4);
+                rst.park.currentExpenditure = chunk.getMoney();
+                rst.park.currentProfit = chunk.getMoney();
+                rst.park.weeklyProfitAverageDividend = chunk.getMoney();
+                rst.park.weeklyProfitAverageDivisor = chunk.getInt(4);
+                rst.park.totalAdmissions = chunk.getMoney();
+                rst.park.totalIncomeFromAdmissions = chunk.getMoney();
+                rst.park.totalRideValueForMoney = chunk.getMoney(4);
+                rst.park.numGuestsInParkLastWeek = chunk.getInt(4);
+                rst.park.guestChangeModifier = chunk.getInt(4);
+                rst.park.guestGenerationProbability = chunk.getInt(4);
+                rst.park.suggestedGuestMaximum = chunk.getInt(4);
+                rst.park.peepWarningThrottle = chunk.getIntArray();
+                rst.park.parkRatingHistory = chunk.getIntArray();
+                rst.park.guestsInParkHistory = chunk.getIntArray();
+                rst.park.cashHistory = chunk.getIntArray();
+                rst.park.weeklyProfitHistory = chunk.getIntArray();
+                rst.park.parkValueHistory = chunk.getIntArray();
                 break;
 
             // 0x07  History (not used)
@@ -292,6 +299,16 @@ class OpenRCT2Lib {
 
             // 0x20  Interface
             case 0x20:
+                chunk.getDebug();
+                rst.interface = {};
+                rst.interface.savedView = {
+                    'x': chunk.getInt(4),
+                    'y': chunk.getInt(4),
+                    'zoom': chunk.getInt(4),
+                    'rotation': chunk.getInt(4),
+                    'lastEntranceStyle': chunk.getInt(4),
+                    'editorStep': chunk.getInt(4),
+                };
                 break;
 
             // 0x30  Tiles
@@ -505,6 +522,29 @@ class rctBuffer {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Get News item
+     */
+    getNewsItem() {
+        return {
+            'type': this.getInt(4),
+            'flags': this.getInt(4),
+            'assoc': this.getInt(4),
+            'ticks': this.getInt(4),
+            'monthYear': this.getInt(4),
+            'day': this.getInt(4),
+            'text': this.getString(),
+        }
+    }
+
+    /**
+     * For debug
+     */
+    getDebug(size=100) {
+        console.log(this.getInt2Arr(size));
+        this._pos -= size;
     }
 }
 module.exports = exports = OpenRCT2Lib;
