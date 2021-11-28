@@ -1,7 +1,25 @@
-const util = require('util');
 const OpenRCT2Lib = require('../OpenRCT2Lib.js');
 
-const scenario_path = './aa.park';
-let file = new OpenRCT2Lib(scenario_path);
-// console.log(JSON.stringify(file.getData(), null, "  "));
-file.getData();
+
+let parkData = new OpenRCT2Lib(__dirname + '/Forest Frontiers.park');
+console.log(parkData);
+/*
+// Returns:
+{
+	header: {
+		'magic': 1263681872,
+		'targetVersion': 6,
+		...
+	},
+	chunkData: {
+		'1': {
+			'engine': 'OpenRCT2, v0.3.5.1 (6e839bd on develop) provided by GitHub',
+			'authors': [],
+			...
+		},
+		'2': { ... },
+		...
+		'55': { ... },
+	}
+}
+*/
