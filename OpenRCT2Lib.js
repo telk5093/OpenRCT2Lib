@@ -139,7 +139,7 @@ class OpenRCT2Lib {
                         objectiveTypeText = 'Have Fun!';
                         break;
                     case 4:   //OBJECTIVE_BUILD_THE_BEST,
-                       objectiveTypeText = 'Build the best {guests} you can!';
+                        objectiveTypeText = 'Build the best {guests} you can!';
                         break;
                     case 5:   //OBJECTIVE_10_ROLLERCOASTERS,
                         objectiveTypeText = 'To have 10 different types of roller coasters operating in your park, each with an excitement value of at least 6.00';
@@ -181,8 +181,8 @@ class OpenRCT2Lib {
             case 0x04:
                 rst.gamePaused = chunk.getInt(4);
                 rst.currentTicks = chunk.getInt(4);
-                rst.DateMonthTicks = chunk.getInt(4);
-                rst.DateMonthsElapsed = chunk.getInt(4);
+                rst.dateMonthTicks = chunk.getInt(4);
+                rst.dateMonthsElapsed = chunk.getInt(4);
                 rst.rand = [
                     chunk.getInt(4),
                     chunk.getInt(4),
@@ -260,7 +260,7 @@ class OpenRCT2Lib {
                 rst.suggestedGuestMaximum = chunk.getInt(4);
                 rst.peepWarningThrottle = chunk.getIntArray();
                 rst.parkRatingHistory = chunk.getIntArray();
-                rst.GuestsInParkHistory = chunk.getIntArray();
+                rst.guestsInParkHistory = chunk.getIntArray();
                 rst.cashHistory = chunk.getIntArray();
                 rst.weeklyProfitHistory = chunk.getIntArray();
                 rst.parkValueHistory = chunk.getIntArray();
