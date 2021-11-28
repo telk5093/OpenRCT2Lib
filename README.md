@@ -4,7 +4,10 @@ This offers _*.park_ file's informations, such as Park's name, Scenario's object
 
 # Example
 ```nodejs
+const OpenRCT2Lib = require('OpenRCT2Lib.js');
 
+let parkData = new OpenRCT2Lib(__dirname + '/Example.park');
+console.log(parkData);
 ```
 
 # Header
