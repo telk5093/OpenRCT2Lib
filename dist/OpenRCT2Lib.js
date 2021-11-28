@@ -118,6 +118,7 @@ class OpenRCT2Lib {
 
             // 0x02  Objects
             case 0x02:
+                rst.object = {};
                 break;
 
             // 0x03  Scenario
@@ -295,11 +296,11 @@ class OpenRCT2Lib {
 
             // 0x09  Notifications
             case 0x09:
+                rst.notifications = {};
                 break;
 
             // 0x20  Interface
             case 0x20:
-                chunk.getDebug();
                 rst.interface = {};
                 rst.interface.savedView = {
                     'x': chunk.getInt(4),
@@ -313,14 +314,17 @@ class OpenRCT2Lib {
 
             // 0x30  Tiles
             case 0x30:
+                rst.tiles = {};
                 break;
 
             // 0x31  Entities
             case 0x31:
+                rst.entities = {};
                 break;
 
             // 0x33  Banners
             case 0x33:
+                rst.banners = {};
                 break;
 
             // 0x35  Staff (not used)
@@ -329,6 +333,7 @@ class OpenRCT2Lib {
 
             // 0x36  Cheats
             case 0x36:
+                rst.cheats = {};
                 break;
 
             // 0x37  Restricted objects
@@ -337,11 +342,12 @@ class OpenRCT2Lib {
 
             // 0x80  Packed objects
             case 0x80:
+                rst.packedObjects = {};
                 break;
 
             // Unknown chunk
             default:
-                rst = chunkData;
+                rst.unknown = chunkData;
         }
 
         return rst;
