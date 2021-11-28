@@ -14,6 +14,7 @@ class OpenRCT2Lib {
             throw 'File not exists';
         }
         this._rawdata = fs.readFileSync(this._path);
+        return this.getData();
 	}
 
     /**
@@ -50,20 +51,20 @@ class OpenRCT2Lib {
         // Header
         rst.header = {};
         let headerBuffer = new rctBuffer(HeaderRawData);
-		rst.header.Magic            = headerBuffer.getInt(4);   //= 1263681872
-		rst.header.TargetVersion    = headerBuffer.getInt(4);   //=6
-		rst.header.MinVersion       = headerBuffer.getInt(4);   //=6
-		rst.header.NumChunks        = headerBuffer.getInt(4);   //=16
-		rst.header.UncompressedSize = headerBuffer.getInt(8);
-		rst.header.Compression      = headerBuffer.getInt(4);   // 0=NONE, 1=GZIP
-		rst.header.CompressedSize   = headerBuffer.getInt(8);
+		rst.header.magic            = headerBuffer.getInt(4);   //= 1263681872
+		rst.header.targetVersion    = headerBuffer.getInt(4);   //=6
+		rst.header.minVersion       = headerBuffer.getInt(4);   //=6
+		rst.header.numChunks        = headerBuffer.getInt(4);   //=16
+		rst.header.uncompressedSize = headerBuffer.getInt(8);
+		rst.header.compression      = headerBuffer.getInt(4);   // 0=NONE, 1=GZIP
+		rst.header.compressedSize   = headerBuffer.getInt(8);
 		rst.header.FNV1a            = headerBuffer.getInt2Arr(8);
 		rst.header.padding          = headerBuffer.getInt2Arr(20);
         this._pos += 64;
 
         // Read chunk's meta data
         let chunkMetaData = [];
-        for (let i=0; i<rst.header.NumChunks; i++) {
+        for (let i=0; i<rst.header.numChunks; i++) {
             let _chunkID     = this.getInt(4);
             let _chunkOffset = this.getInt(8);
             let _chunkSize   = this.getInt(8);
@@ -75,7 +76,7 @@ class OpenRCT2Lib {
 
         // Start game data
         let gameData = this._rawdata.slice(this._pos);
-        if (rst.header.Compression === 1) {
+        if (rst.header.compression === 1) {
             gameData = pako.ungzip(gameData, {to: 'hex'});
         }
         
@@ -283,8 +284,6 @@ class OpenRCT2Lib {
                 rst.research.nextItem = chunk.getResearchItem();
                 rst.research.itemsUninvented = chunk.getResearchItemArray();
                 rst.research.itemsInvented = chunk.getResearchItemArray();
-
-                console.log(rst);
                 break;
 
             // 0x09  Notifications
