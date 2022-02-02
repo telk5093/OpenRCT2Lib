@@ -3,6 +3,11 @@ const fs = require('fs');
 const pako = require('pako');
 
 class OpenRCT2Lib {
+    /**
+     * Constructor
+     * @param string path                       *.park's file path
+     * @return Object                           Parsed data
+     */
     constructor(path) {
 		this._path = path;
         this._pos = 0;
@@ -28,13 +33,6 @@ class OpenRCT2Lib {
         }
         return (rst * 1);
     }
-    getInt2Arr(length = 1) {
-        let rst = [];
-        for (let n = 0; n < length; n++) {
-            rst.push(this.getInt(1));
-        }
-        return rst;
-    }
 
     /**
      * Get header and parse chunk data
@@ -50,7 +48,7 @@ class OpenRCT2Lib {
         // Header
         rst.header = {};
         let headerBuffer = new rctBuffer(HeaderRawData);
-		rst.header.magic            = headerBuffer.getInt(4);   //= 1263681872
+		rst.header.magic            = headerBuffer.getInt(4);   //=1263681872
 		rst.header.targetVersion    = headerBuffer.getInt(4);   //=6
 		rst.header.minVersion       = headerBuffer.getInt(4);   //=6
 		rst.header.numChunks        = headerBuffer.getInt(4);   //=16
@@ -119,6 +117,28 @@ class OpenRCT2Lib {
             // 0x02  Objects
             case 0x02:
                 rst.object = {};
+                rst.object.numSubLists = chunk.getInt(4);
+                for (let i=0; i<rst.object.numSubLists; i++) {
+                    rst.object.objectType = chunk.getInt(4);
+                    rst.object.subListSize = chunk.getInt(4);
+                    
+                    for (let j=0; j<rst.object.subListSize; j++) {
+                        let kind = chunk.getInt(8);
+                        chunk.getDebug();
+                        break;
+                        switch(kind) {
+                            case 0:   // DESCRIPTOR_NONE
+                                break;
+                            case 1:   // DESCRIPTOR_DAT
+
+                                break;
+                            case 2:   // DESCRIPTOR_JSON
+                                break;
+                        }
+                    }
+                }
+                chunk.getDebug();
+                console.log(rst.object);
                 break;
 
             // 0x03  Scenario
@@ -190,10 +210,6 @@ class OpenRCT2Lib {
                 rst.general.dateMonthTicks = chunk.getInt(4);
                 rst.general.dateMonthsElapsed = chunk.getInt(4);
                 rst.general.rand = chunk.getInt(8);
-                // rst.general.rand = [
-                //     chunk.getInt(4),
-                //     chunk.getInt(4),
-                // ];
                 rst.general.guestInitialHappiness = chunk.getInt(4);
                 rst.general.guestInitialCash = chunk.getMoney(4);
                 rst.general.guestInitialHunger = chunk.getInt(4);
@@ -548,6 +564,13 @@ class rctBuffer {
     /**
      * For debug
      */
+    getInt2Arr(length = 1) {
+        let rst = [];
+        for (let n = 0; n < length; n++) {
+            rst.push(this.getInt(1));
+        }
+        return rst;
+    }
     getDebug(size=100) {
         console.log(this.getInt2Arr(size));
         this._pos -= size;
