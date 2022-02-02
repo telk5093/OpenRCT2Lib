@@ -2,9 +2,12 @@
 **OpenRCT2Lib** parses [OpenRCT2](https://github.com/OpenRCT2/OpenRCT2)'s New Savefile format (_*.park_).  
 This offers _*.park_ file's informations, such as Park's name, Scenario's objective and etc.
 
+# Install
+``npm install --save openrct2lib``
+
 # Example
 ```nodejs
-const OpenRCT2Lib = require('OpenRCT2Lib.js');
+const OpenRCT2Lib = require('openrct2lib');
 
 let parkData = new OpenRCT2Lib(__dirname + '/Example.park');
 console.log(parkData.park.name);      // Park's name
