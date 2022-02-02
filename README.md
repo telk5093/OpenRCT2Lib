@@ -157,7 +157,12 @@ _(Not supported yet)_
 
 
 ## 0x30: Tiles
-_(Not supported yet)_
+_(Not fully supported yet)_
+
+| Property        | Description | Misc. |
+|-----------------|-------------|-------|
+| tiles.mapX      | Map width   |       |
+| tiles.mapY      | Map height  |       |
 
 
 ## 0x31: Entities

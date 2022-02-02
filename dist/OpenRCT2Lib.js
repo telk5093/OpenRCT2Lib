@@ -36,7 +36,7 @@ class OpenRCT2Lib {
 
     /**
      * Get header and parse chunk data
-     * @ref /src/openrct2/ParkFile.cpp:158
+     * @ref /src/openrct2/park/ParkFile.cpp:146
      * @ref /src/openrct2/core/OrcaStream.hpp:42
      */
 	getData() {
@@ -124,7 +124,7 @@ class OpenRCT2Lib {
                     
                     for (let j=0; j<rst.object.subListSize; j++) {
                         let kind = chunk.getInt(8);
-                        chunk.getDebug();
+                        // chunk.getDebug();
                         break;
                         switch(kind) {
                             case 0:   // DESCRIPTOR_NONE
@@ -137,8 +137,8 @@ class OpenRCT2Lib {
                         }
                     }
                 }
-                chunk.getDebug();
-                console.log(rst.object);
+                // chunk.getDebug();
+                // console.log(rst.object);
                 break;
 
             // 0x03  Scenario
@@ -331,6 +331,8 @@ class OpenRCT2Lib {
             // 0x30  Tiles
             case 0x30:
                 rst.tiles = {};
+                rst.tiles.mapX = chunk.getInt(4);
+                rst.tiles.mapY = chunk.getInt(4);
                 break;
 
             // 0x31  Entities
