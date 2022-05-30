@@ -49,8 +49,8 @@ class OpenRCT2Lib {
         rst.header = {};
         let headerBuffer = new rctBuffer(HeaderRawData);
 		rst.header.magic            = headerBuffer.getInt(4);   //=1263681872
-		rst.header.targetVersion    = headerBuffer.getInt(4);   //=6
-		rst.header.minVersion       = headerBuffer.getInt(4);   //=6
+		rst.header.targetVersion    = headerBuffer.getInt(4);   //=6~
+		rst.header.minVersion       = headerBuffer.getInt(4);   //=6~
 		rst.header.numChunks        = headerBuffer.getInt(4);   //=16
 		rst.header.uncompressedSize = headerBuffer.getInt(8);
 		rst.header.compression      = headerBuffer.getInt(4);   // 0=NONE, 1=GZIP
@@ -84,7 +84,7 @@ class OpenRCT2Lib {
             let _chunkOffset = chunkMetaData[c][1];
             let _chunkSize   = chunkMetaData[c][2];
             let currentChunkData = gameData.slice(_chunkOffset, _chunkOffset + _chunkSize);
-            let _chunkData = this.getChunk(_chunkID, currentChunkData)
+            let _chunkData = this.getChunk(_chunkID, currentChunkData);
             let _key = Object.keys(_chunkData)[0];
             if (_key && _key != '0') {
                 rst[_key] = _chunkData[_key];
@@ -340,6 +340,11 @@ class OpenRCT2Lib {
                 rst.entities = {};
                 break;
 
+            // 0x32  Rides
+            case 0x32:
+                rst.rides = {};
+                break;
+
             // 0x33  Banners
             case 0x33:
                 rst.banners = {};
@@ -451,6 +456,9 @@ class rctBuffer {
         let rst = [];
         let arrayLength = this.getInt(4);
         let arrayElementSize = this.getInt(4);
+        if (arrayElementSize <= 0) {
+            return [];
+        }
         for(let i=0; i<arrayLength; i++) {
             rst.push(this.getInt(arrayElementSize));
         }
@@ -519,14 +527,11 @@ class rctBuffer {
             let ord = this._rawdata[this._pos++];
             n++;
             if (ord === 0) {
-                // return Buffer.from(arr).toString('utf8');
-                return rst;
+                return Buffer.from(arr).toString('utf8');
             } else {
-                // arr.push(ord);
-                rst += String.fromCharCode(ord);
+                arr.push(ord);
             }
         }
-        // return Buffer.from(arr).toString('utf8') + '...';
         return rst + '...';
     }
 
