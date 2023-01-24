@@ -191,7 +191,7 @@ _(Not supported yet)_
 
 
 # References
- * https://github.com/OpenRCT2/OpenRCT2/blob/develop/src/openrct2/ParkFile.cpp
+ * https://github.com/OpenRCT2/OpenRCT2/blob/develop/src/openrct2/park/ParkFile.cpp
  * https://raw.githubusercontent.com/OpenRCT2/OpenRCT2/develop/docs/save-format.md  
  (I think it might be outdated but useful for ref.)
 

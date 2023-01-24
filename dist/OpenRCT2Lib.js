@@ -149,8 +149,15 @@ class OpenRCT2Lib {
                 rst.scenario.parkName = chunk.getStringTable();
                 rst.scenario.details = chunk.getStringTable();
 
-                let objectiveType = chunk.getInt(4);
-                let objectiveYear = chunk.getInt(4);
+                let objectiveType = chunk.getInt(4);   // gScenarioObjective.Type
+                let objectiveArg1 = chunk.getInt(4);   // gScenarioObjective.Year
+                let objectiveArg3 = chunk.getInt(4);   // gScenarioObjective.NumGuests
+                let objectiveArg2 = chunk.getInt(8);   // gScenarioObjective.Currency
+
+                let ratingWarningDays = chunk.getInt(2);   // gScenarioParkRatingWarningDays
+                let completedCompanyValue = chunk.getMoney(8);   // gScenarioCompletedCompanyValue
+                let allowEarlyCompletion = chunk.getBool();
+                let scenarioFileName = chunk.getString();   // gScenarioFileName
 
                 let objectiveTypeText = null;
                 switch (objectiveType) {
@@ -192,13 +199,13 @@ class OpenRCT2Lib {
                 rst.scenario.objective = {
                     'type': objectiveType,
                     'typeText': objectiveTypeText,
-                    'year': objectiveYear,
-                    'guests': chunk.getInt(8),    // shares num. guests(objectiveType=01), RideId(objectiveType=04) or MinimumLength(objectiveType=08)
-                    'currency': chunk.getInt(8),  // shares Currency or MinimumExcitement(objectiveType=09)
-                    'ratingWarningDays': chunk.getInt(2),
-                    'completedCompanyValue': chunk.getMoney(8),
-                    'allowEarlyCompletion': chunk.getBool(),
-                    'scenarioFileName': chunk.getString(),
+                    'year': objectiveArg1,
+                    'guests': objectiveArg3,    // shares num. guests(objectiveType=01), RideId(objectiveType=04) or MinimumLength(objectiveType=08)
+                    'currency': objectiveArg2,  // shares Currency or MinimumExcitement(objectiveType=09)
+                    'ratingWarningDays': ratingWarningDays,
+                    'completedCompanyValue': completedCompanyValue,
+                    'allowEarlyCompletion': allowEarlyCompletion,
+                    'scenarioFileName': scenarioFileName,
                 };
                 break;
 
@@ -385,7 +392,7 @@ class rctBuffer {
 
     /**
      * Read integer with given size
-     * @param int size                           Size in bytes
+     * @param int size                           Size in quater bytes
      * @return int
      */
     getInt(size = 1) {
