@@ -1,6 +1,6 @@
 {
   "name": "openrct2lib",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "OpenRCT2 New Savefile Format parser",
   "main": "dist/OpenRCT2Lib.js",
   "scripts": {
