@@ -9,10 +9,11 @@ This offers _*.park_ file's informations, such as Park's name, Scenario's object
 ```nodejs
 const OpenRCT2Lib = require('openrct2lib');
 
-let parkData = new OpenRCT2Lib(__dirname + '/Example.park');
-console.log(parkData.park.name);      // Park's name
-console.log(parkData.park.cash);      // Park's cash
-console.log(parkData.scenario.name);  // Scenario's name
+let parkData = new OpenRCT2Lib(__dirname + '/Example.park').then(parkData => {
+    console.log(parkData.park.name);      // Park's name
+    console.log(parkData.park.cash);      // Park's cash
+    console.log(parkData.scenario.name);  // Scenario's name
+});
 ```
 
 # Header
