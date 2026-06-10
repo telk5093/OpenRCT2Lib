@@ -28,6 +28,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "pako": "^2.0.4"
+    "@mongodb-js/zstd": "^7.0.0",
+    "pako": "^2.0.4",
+    "simple-zstd": "^2.1.0"
   }
 }

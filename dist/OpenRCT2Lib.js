@@ -1,6 +1,7 @@
 "use strict";
 const fs = require('fs');
 const pako = require('pako');
+const zstd = require('@mongodb-js/zstd');
 
 class OpenRCT2Lib {
     /**
@@ -9,7 +10,7 @@ class OpenRCT2Lib {
      * @return Object                           Parsed data
      */
     constructor(path) {
-		this._path = path;
+        this._path = path;
         this._pos = 0;
         this._rawdata = [];
         this._chunkData = {};
@@ -19,7 +20,7 @@ class OpenRCT2Lib {
         }
         this._rawdata = fs.readFileSync(this._path);
         return this.getData();
-	}
+    }
 
     /**
      * Read integer with given size
@@ -39,8 +40,10 @@ class OpenRCT2Lib {
      * @ref /src/openrct2/park/ParkFile.cpp:146
      * @ref /src/openrct2/core/OrcaStream.hpp:42
      */
-	getData() {
-        let rst = {};
+    async getData() {
+        let rst = {
+            isNSF: true,
+        };
 
         // Split the Header and the rest data
         let HeaderRawData = this._rawdata.slice(0, 64);
@@ -48,15 +51,15 @@ class OpenRCT2Lib {
         // Header
         rst.header = {};
         let headerBuffer = new rctBuffer(HeaderRawData);
-		rst.header.magic            = headerBuffer.getInt(4);   //=1263681872
-		rst.header.targetVersion    = headerBuffer.getInt(4);   //=6~
-		rst.header.minVersion       = headerBuffer.getInt(4);   //=6~
-		rst.header.numChunks        = headerBuffer.getInt(4);   //=16
-		rst.header.uncompressedSize = headerBuffer.getInt(8);
-		rst.header.compression      = headerBuffer.getInt(4);   // 0=NONE, 1=GZIP
-		rst.header.compressedSize   = headerBuffer.getInt(8);
-		rst.header.FNV1a            = headerBuffer.getInt2Arr(8);
-		rst.header.padding          = headerBuffer.getInt2Arr(20);
+        rst.header.magic            = headerBuffer.getInt(4);   //=1263681872
+        rst.header.targetVersion    = headerBuffer.getInt(4);   //=6~
+        rst.header.minVersion       = headerBuffer.getInt(4);   //=6~
+        rst.header.numChunks        = headerBuffer.getInt(4);   //=16
+        rst.header.uncompressedSize = headerBuffer.getInt(8);
+        rst.header.compression      = headerBuffer.getInt(4);   // 0=NONE, 1=GZIP, 2=ZSTD
+        rst.header.compressedSize   = headerBuffer.getInt(8);
+        rst.header.FNV1a            = headerBuffer.getInt2Arr(8);
+        rst.header.padding          = headerBuffer.getInt2Arr(20);
         this._pos += 64;
 
         // Read chunk's meta data
@@ -75,6 +78,8 @@ class OpenRCT2Lib {
         let gameData = this._rawdata.slice(this._pos);
         if (rst.header.compression === 1) {
             gameData = pako.ungzip(gameData, {to: 'hex'});
+        } else if (rst.header.compression === 2) {
+            gameData = await zstd.decompress(gameData);
         }
         
         // Split each chunk
@@ -90,10 +95,11 @@ class OpenRCT2Lib {
                 rst[_key] = _chunkData[_key];
             }
             chunkPos += _chunkSize;
+
         }
 
         return rst;
-	}
+    }
 
     /**
      * Read chunk's data
@@ -109,6 +115,8 @@ class OpenRCT2Lib {
             case 0x01:
                 rst.authoring = {};
                 rst.authoring.engine = chunk.getString();
+                return rst.authoring.engine;
+
                 rst.authoring.authors = chunk.getStringArray();
                 rst.authoring.dateStarted = chunk.getTimestamp();
                 rst.authoring.dateModified = chunk.getTimestamp();
@@ -523,7 +531,7 @@ class rctBuffer {
         return rst;
     }
 
-	/**
+    /**
      * Get string
      */
     getString() {

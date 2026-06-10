@@ -1,8 +1,10 @@
 const OpenRCT2Lib = require('../dist/OpenRCT2Lib.js');
 
+const filepath = __dirname + '/Forest Frontiers.park';
+new OpenRCT2Lib(filepath).then(parkData => {
+    console.log(parkData);
+});
 
-let parkData = new OpenRCT2Lib(__dirname + '/Forest Frontiers.park');
-console.log(parkData);
 /*
 // Returns:
 {
